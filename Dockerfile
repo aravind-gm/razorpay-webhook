@@ -2,11 +2,14 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package*.json ./
+COPY prisma ./prisma/
+
 RUN npm ci
+
+RUN npx prisma generate
 
 COPY tsconfig.json ./
 COPY src ./src
-COPY prisma ./prisma/
 
 RUN npm run build
 
@@ -17,12 +20,12 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci --omit=dev
 
-# Copy Prisma schema (needed for Prisma client)
+# Copy Prisma schema and generated client
 COPY prisma ./prisma/
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Copy compiled code from builder
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 EXPOSE 3001
 
