@@ -7,7 +7,7 @@
     "dev": "ts-node src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "postinstall": "echo 'Postinstall: Prisma client generation handled in Dockerfile'",
+    "postinstall": "npx prisma generate",
     "prisma:generate": "npx prisma generate"
   },
   "dependencies": {
