@@ -11,6 +11,30 @@ const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3001;
 
 // ============================================
+// TYPE DEFINITIONS
+// ============================================
+interface RazorpayWebhookEvent {
+  event: string;
+  payload?: {
+    payment?: {
+      entity?: {
+        id: string;
+        order_id: string;
+        amount: number;
+        status: string;
+        error_source?: {
+          error_reason: string;
+        };
+        [key: string]: unknown;
+      };
+      [key: string]: unknown;
+    };
+    [key: string]: unknown;
+  };
+  [key: string]: unknown;
+}
+
+// ============================================
 // MIDDLEWARE SETUP (CRITICAL ORDER)
 // ============================================
 
@@ -149,7 +173,7 @@ app.post('/webhook/razorpay', async (req: Request, res: Response) => {
 // HANDLER: payment.captured
 // ────────────────────────────────────────────
 async function handlePaymentCaptured(
-  event: Record<string, unknown>,
+  event: RazorpayWebhookEvent,
   requestId: string,
   res: Response
 ): Promise<Response> {
@@ -248,7 +272,7 @@ async function handlePaymentCaptured(
 // HANDLER: payment.failed
 // ────────────────────────────────────────────
 async function handlePaymentFailed(
-  event: Record<string, unknown>,
+  event: RazorpayWebhookEvent,
   requestId: string,
   res: Response
 ): Promise<Response> {
